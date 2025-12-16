@@ -74,7 +74,8 @@ public class TiredThread extends Thread implements Comparable<TiredThread> {
 
     @Override
     public int compareTo(TiredThread o) {
-        // TODO
+        if (getFatigue() > o.getFatigue()) return 1;
+        else if (getFatigue() < o.getFatigue()) return -1;
         return 0;
     }
 }

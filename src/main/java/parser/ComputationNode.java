@@ -85,7 +85,7 @@ public class ComputationNode {
      * Resolves this node by setting its type to MATRIX and storing the computed matrix.
      */
     public void resolve(double[][] matrix) {
-        this.nodeType = ComputationNodeType.MATRIX;
+    this.nodeType = ComputationNodeType.MATRIX;
         this.children = null;
         this.matrix = matrix;
     }

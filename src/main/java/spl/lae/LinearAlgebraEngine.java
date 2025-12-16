@@ -13,20 +13,29 @@ public class LinearAlgebraEngine {
     private TiredExecutor executor;
 
     public LinearAlgebraEngine(int numThreads) {
-        // TODO: create executor with given thread count
+        executor = new TiredExecutor(numThreads);
     }
 
     public ComputationNode run(ComputationNode computationRoot) {
-        // TODO: resolve computation tree step by step until final matrix is produced
-        return null;
+        while (computationRoot.getNodeType() != ComputationNodeType.MATRIX) {
+            ComputationNode temp = computationRoot.findResolvable();
+            loadAndCompute(temp);
+        }
+        return computationRoot;
     }
 
     public void loadAndCompute(ComputationNode node) {
+        if (node.getNodeType() == ComputationNodeType.ADD) {
+            leftMatrix.loadRowMajor(node.getChildren().get(0).getMatrix());
+            rightMatrix.loadRowMajor(node.getChildren().get(1).getMatrix());
+            createAddTasks();
+        }
         // TODO: load operand matrices
         // TODO: create compute tasks & submit tasks to executor
     }
 
     public List<Runnable> createAddTasks() {
+
         // TODO: return tasks that perform row-wise addition
         return null;
     }

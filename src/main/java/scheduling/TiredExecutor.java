@@ -12,8 +12,12 @@ public class TiredExecutor {
     private final AtomicInteger inFlight = new AtomicInteger(0);
 
     public TiredExecutor(int numThreads) {
-        // TODO
-        workers = null; // placeholder
+        workers = new TiredThread[numThreads];
+        for (int i = 0; i < numThreads; i++) {
+            TiredThread tiredThread = new TiredThread(i, 0.5 + Math.random());
+            workers[i] = tiredThread;
+            idleMinHeap.add(tiredThread);
+        }
     }
 
     public void submit(Runnable task) {
