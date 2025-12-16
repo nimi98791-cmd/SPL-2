@@ -56,7 +56,7 @@ public class TiredThread extends Thread implements Comparable<TiredThread> {
      * it throws IllegalStateException.
      */
     public void newTask(Runnable task) {
-       // TODO
+        handoff.add(task);
     }
 
     /**
@@ -69,13 +69,21 @@ public class TiredThread extends Thread implements Comparable<TiredThread> {
 
     @Override
     public void run() {
-       // TODO
+        while (true) {
+            try {
+                Runnable task = handoff.take();
+                task.run();
+            } catch (InterruptedException e) {
+                break;
+            }
+        }
     }
 
     @Override
     public int compareTo(TiredThread o) {
-        if (getFatigue() > o.getFatigue()) return 1;
-        else if (getFatigue() < o.getFatigue()) return -1;
-        return 0;
+        return Double.compare(getFatigue(), o.getFatigue());
+//        if (getFatigue() > o.getFatigue()) return 1;
+//        else if (getFatigue() < o.getFatigue()) return -1;
+//        return 0;
     }
 }

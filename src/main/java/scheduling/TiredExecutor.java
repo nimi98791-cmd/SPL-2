@@ -21,15 +21,62 @@ public class TiredExecutor {
     }
 
     public void submit(Runnable task) {
-        // TODO
+        inFlight.incrementAndGet();
+
+        TiredThread t;
+        try {
+            t = idleMinHeap.take();
+        } catch (InterruptedException e) {
+            inFlight.decrementAndGet();
+            Thread.currentThread().interrupt();
+            return;
+        }
+        t.newTask(() -> {
+            try {
+                task.run();
+            } finally {
+                if (inFlight.decrementAndGet() == 0) {
+                    synchronized (TiredExecutor.this) {
+                        TiredExecutor.this.notifyAll();
+                    }
+                }
+                idleMinHeap.add(t);
+            }
+        });
+
+        if (!t.isAlive()) {
+            t.start();
+        }
     }
 
     public void submitAll(Iterable<Runnable> tasks) {
-        // TODO: submit tasks one by one and wait until all finish
+        for (Runnable task : tasks) {
+            submit(task);
+        }
+        synchronized (this) {
+            while (inFlight.get() > 0) {
+                try {
+                    wait();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    return;
+                }
+            }
+        }
     }
 
     public void shutdown() throws InterruptedException {
-        // TODO
+        for (TiredThread t : workers) {
+            t.interrupt();
+        }
+        for (TiredThread t : workers) {
+            try {
+                t.join();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                break;
+            }
+        }
     }
 
     public synchronized String getWorkerReport() {

@@ -9,9 +9,9 @@ public class Main {
         InputParser parser = new InputParser();
         try {
             ComputationNode root = parser.parse("C:\\Users\\Nimrod\\OneDrive\\Desktop\\programs\\Skeleton\\example2.json");
-            LinearAlgebraEngine engine = new LinearAlgebraEngine(1);
+            LinearAlgebraEngine engine = new LinearAlgebraEngine(5);
             engine.run(root);
-            System.out.println();
+            System.out.println(root);
 
         } catch (ParseException e) {
             System.out.println();

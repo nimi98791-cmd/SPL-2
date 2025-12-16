@@ -9,17 +9,17 @@ public class SharedVector {
     private ReadWriteLock lock = new java.util.concurrent.locks.ReentrantReadWriteLock();
 
     public SharedVector(double[] vector, VectorOrientation orientation) {
-        // TODO: store vector data and its orientation
+        this.vector = vector;
+        this.orientation = orientation;
     }
 
     public double get(int index) {
         // TODO: return element at index (read-locked)
-        return 0;
+        return vector[index];
     }
 
     public int length() {
-        // TODO: return vector length
-        return 0;
+        return vector.length;
     }
 
     public VectorOrientation getOrientation() {
@@ -48,7 +48,9 @@ public class SharedVector {
     }
 
     public void add(SharedVector other) {
-        // TODO: add two vectors
+        for (int i = 0; i < length(); i++) {
+            vector[i] += other.get(i);
+        }
     }
 
     public void negate() {
