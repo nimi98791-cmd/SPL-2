@@ -83,7 +83,14 @@ public class SharedVector {
     }
 
     public void negate() {
-        // TODO: negate vector
+        writeLock();
+        try {
+            for (int i = 0; i < vector.length; i++) {
+                vector[i] = -vector[i];
+            }
+        } finally {
+            writeUnlock();
+            }
     }
 
     public double dot(SharedVector other) {
