@@ -14,33 +14,41 @@ public class SharedVector {
     }
 
     public double get(int index) {
-        // TODO: return element at index (read-locked)
-        return vector[index];
+        {
+            readUnlock();
+            try {return vector[index];}
+            finally{readUnlock();}
+        }
     }
 
-    public int length() {
-        return vector.length;
+    public int length()
+    {
+        readUnlock();
+        try {return vector.length;}
+        finally {readUnlock();}
     }
-
     public VectorOrientation getOrientation() {
-        // TODO: return vector orientation
-        return null;
+        {
+            readUnlock();
+            try {return orientation;}
+            finally {readUnlock();}
+        }
     }
 
     public void writeLock() {
-        // TODO: acquire write lock
+       lock.writeLock().lock();
     }
 
     public void writeUnlock() {
-        // TODO: release write lock
+        lock.writeLock().unlock();
     }
 
     public void readLock() {
-        // TODO: acquire read lock
+        lock.readLock().lock();
     }
 
     public void readUnlock() {
-        // TODO: release read lock
+        lock.readLock().unlock();
     }
 
     public void transpose() {
@@ -48,8 +56,29 @@ public class SharedVector {
     }
 
     public void add(SharedVector other) {
-        for (int i = 0; i < length(); i++) {
-            vector[i] += other.get(i);
+        int myHash = System.identityHashCode(this);
+        int otherHash = System.identityHashCode(other);
+        if (myHash < otherHash) {
+        writeLock();
+        other.readLock();}
+        else {
+            other.readLock();
+            writeLock();
+        }
+        try {
+            for (int i = 0; i < vector.length; i++) {
+                vector[i] += other.get(i);
+            }
+        }
+        finally {
+            if (myHash < otherHash) {
+                other.readUnlock();
+                writeUnlock();
+            }
+            else {
+                writeUnlock();
+                other.readUnlock();
+            }
         }
     }
 
