@@ -4,6 +4,7 @@ import parser.*;
 import memory.*;
 import scheduling.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class LinearAlgebraEngine {
@@ -13,22 +14,51 @@ public class LinearAlgebraEngine {
     private TiredExecutor executor;
 
     public LinearAlgebraEngine(int numThreads) {
-        // TODO: create executor with given thread count
+        executor = new TiredExecutor(numThreads);
     }
 
     public ComputationNode run(ComputationNode computationRoot) {
-        // TODO: resolve computation tree step by step until final matrix is produced
-        return null;
+        while (computationRoot.getNodeType() != ComputationNodeType.MATRIX) {
+            ComputationNode temp = computationRoot.findResolvable();
+            loadAndCompute(temp);
+            temp.resolve(leftMatrix.readRowMajor());
+        }
+        try {
+
+            executor.shutdown();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        return computationRoot;
     }
 
     public void loadAndCompute(ComputationNode node) {
+        if (node.getNodeType() == ComputationNodeType.ADD) {
+            leftMatrix.loadRowMajor(node.getChildren().get(0).getMatrix());
+            rightMatrix.loadRowMajor(node.getChildren().get(1).getMatrix());
+            List<Runnable> tasks = createAddTasks();
+            executor.submitAll(tasks);
+        }
         // TODO: load operand matrices
         // TODO: create compute tasks & submit tasks to executor
     }
 
     public List<Runnable> createAddTasks() {
-        // TODO: return tasks that perform row-wise addition
-        return null;
+        List<Runnable> tasks = new ArrayList<>();
+        for (int i = 0; i < leftMatrix.length(); i++) {
+            int index = i;
+            tasks.add(()-> {
+                System.out.println("thread start");
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    System.out.println();
+                }
+                leftMatrix.get(index).add(rightMatrix.get(index));
+                System.out.println("thread end");
+            });
+        }
+        return tasks;
     }
 
     public List<Runnable> createMultiplyTasks() {

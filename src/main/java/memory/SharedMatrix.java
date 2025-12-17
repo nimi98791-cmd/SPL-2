@@ -13,7 +13,10 @@ public class SharedMatrix {
     }
 
     public void loadRowMajor(double[][] matrix) {
-        // TODO: replace internal data with new row-major matrix
+        vectors = new SharedVector[matrix.length];
+        for (int i = 0; i < matrix.length; i++) {
+            vectors[i] = new SharedVector(matrix[i], VectorOrientation.ROW_MAJOR);
+        }
     }
 
     public void loadColumnMajor(double[][] matrix) {
@@ -21,18 +24,21 @@ public class SharedMatrix {
     }
 
     public double[][] readRowMajor() {
-        // TODO: return matrix contents as a row-major double[][]
-        return null;
+        double[][] ans = new double[vectors.length][vectors[0].length()];
+        for (int i = 0; i < vectors.length; i++) {
+            for (int j = 0; j < vectors[i].length(); j++) {
+                ans[i][j] = vectors[i].get(j);
+            }
+        }
+        return ans;
     }
 
     public SharedVector get(int index) {
-        // TODO: return vector at index
-        return null;
+        return vectors[index];
     }
 
     public int length() {
-        // TODO: return number of stored vectors
-        return 0;
+        return vectors.length;
     }
 
     public VectorOrientation getOrientation() {
