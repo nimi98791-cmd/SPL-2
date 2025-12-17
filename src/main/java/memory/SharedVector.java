@@ -15,7 +15,7 @@ public class SharedVector {
 
     public double get(int index) {
         {
-            readUnlock();
+            readLock();
             try {return vector[index];}
             finally{readUnlock();}
         }
@@ -23,13 +23,13 @@ public class SharedVector {
 
     public int length()
     {
-        readUnlock();
+        readLock();
         try {return vector.length;}
         finally {readUnlock();}
     }
     public VectorOrientation getOrientation() {
         {
-            readUnlock();
+            readLock();
             try {return orientation;}
             finally {readUnlock();}
         }
