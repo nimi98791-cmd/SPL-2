@@ -16,27 +16,36 @@ public class SharedVector {
     public double get(int index) {
         {
             readLock();
-            try {return vector[index];}
-            finally{readUnlock();}
+            try {
+                return vector[index];
+            } finally {
+                readUnlock();
+            }
         }
     }
 
-    public int length()
-    {
+    public int length() {
         readLock();
-        try {return vector.length;}
-        finally {readUnlock();}
+        try {
+            return vector.length;
+        } finally {
+            readUnlock();
+        }
     }
+
     public VectorOrientation getOrientation() {
         {
             readLock();
-            try {return orientation;}
-            finally {readUnlock();}
+            try {
+                return orientation;
+            } finally {
+                readUnlock();
+            }
         }
     }
 
     public void writeLock() {
-       lock.writeLock().lock();
+        lock.writeLock().lock();
     }
 
     public void writeUnlock() {
@@ -56,29 +65,15 @@ public class SharedVector {
     }
 
     public void add(SharedVector other) {
-        int myHash = System.identityHashCode(this);
-        int otherHash = System.identityHashCode(other);
-        if (myHash < otherHash) {
         writeLock();
-        other.readLock();}
-        else {
-            other.readLock();
-            writeLock();
-        }
+        other.readLock();
         try {
             for (int i = 0; i < vector.length; i++) {
                 vector[i] += other.get(i);
             }
-        }
-        finally {
-            if (myHash < otherHash) {
-                other.readUnlock();
-                writeUnlock();
-            }
-            else {
-                writeUnlock();
-                other.readUnlock();
-            }
+        } finally {
+            other.readUnlock();
+            writeUnlock();
         }
     }
 
@@ -90,7 +85,7 @@ public class SharedVector {
             }
         } finally {
             writeUnlock();
-            }
+        }
     }
 
     public double dot(SharedVector other) {
