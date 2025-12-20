@@ -13,8 +13,8 @@ public class SharedMatrix {
     }
 
     public void loadRowMajor(double[][] matrix) {
-        SharedVector[] currentVectors = vectors; // In case vectors is changed until release.
-        acquireAllVectorReadLocks(currentVectors);
+        SharedVector[] currentVectors = vectors;
+        acquireAllVectorWriteLocks(currentVectors);
         try {
             SharedVector[] newVectors = new SharedVector[matrix.length];
             for (int i = 0; i < matrix.length; i++) {
@@ -31,7 +31,7 @@ public class SharedMatrix {
     }
 
     public double[][] readRowMajor() {
-        SharedVector[] currentVectors = vectors; // In case vectors is changed until release.
+        SharedVector[] currentVectors = vectors;
         acquireAllVectorReadLocks(currentVectors);
         try {
             if (currentVectors.length == 0) return new double[0][0];

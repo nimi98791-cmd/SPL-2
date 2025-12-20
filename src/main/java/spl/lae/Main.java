@@ -8,10 +8,15 @@ public class Main {
     public static void main(String[] args) throws IOException {
         InputParser parser = new InputParser();
         try {
-            ComputationNode root = parser.parse("C:\\Users\\Nimrod\\OneDrive\\Desktop\\programs\\Skeleton\\example2.json");
-            LinearAlgebraEngine engine = new LinearAlgebraEngine(5);
+            ComputationNode root = parser.parse(args[1]);
+            LinearAlgebraEngine engine = new LinearAlgebraEngine(Integer.parseInt(args[0]));
             engine.run(root);
-            System.out.println(root);
+            for (double[] row : root.getMatrix()) {
+                for (double value : row) {
+                    System.out.print(value + " ");
+                }
+                System.out.println();
+            }
 
         } catch (ParseException e) {
             System.out.println();

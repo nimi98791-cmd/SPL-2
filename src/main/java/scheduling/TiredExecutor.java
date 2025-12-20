@@ -25,7 +25,7 @@ public class TiredExecutor {
         synchronized (this) {
             while (idleMinHeap.isEmpty()) {
                 try {
-                    this.wait();
+                    this.wait(); // Wait for available thread.
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
