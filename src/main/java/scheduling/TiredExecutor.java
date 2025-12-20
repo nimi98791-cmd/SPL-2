@@ -48,6 +48,7 @@ public class TiredExecutor {
     }
 
     public void submitAll(Iterable<Runnable> tasks) {
+        System.out.println("Start submit all");
         for (Runnable task : tasks) {
             submit(task);
         }
@@ -60,6 +61,7 @@ public class TiredExecutor {
                 }
             }
         }
+        System.out.println("Finished submit all");
 //        synchronized (this) {
 //            while (inFlight.get() > 0) {
 //                try {
