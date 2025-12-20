@@ -14,33 +14,50 @@ public class SharedVector {
     }
 
     public double get(int index) {
-        // TODO: return element at index (read-locked)
-        return vector[index];
+        {
+            readLock();
+            try {
+                return vector[index];
+            } finally {
+                readUnlock();
+            }
+        }
     }
 
     public int length() {
-        return vector.length;
+        readLock();
+        try {
+            return vector.length;
+        } finally {
+            readUnlock();
+        }
     }
 
     public VectorOrientation getOrientation() {
-        // TODO: return vector orientation
-        return null;
+        {
+            readLock();
+            try {
+                return orientation;
+            } finally {
+                readUnlock();
+            }
+        }
     }
 
     public void writeLock() {
-        // TODO: acquire write lock
+        lock.writeLock().lock();
     }
 
     public void writeUnlock() {
-        // TODO: release write lock
+        lock.writeLock().unlock();
     }
 
     public void readLock() {
-        // TODO: acquire read lock
+        lock.readLock().lock();
     }
 
     public void readUnlock() {
-        // TODO: release read lock
+        lock.readLock().unlock();
     }
 
     public void transpose() {
@@ -48,13 +65,27 @@ public class SharedVector {
     }
 
     public void add(SharedVector other) {
-        for (int i = 0; i < length(); i++) {
-            vector[i] += other.get(i);
+        writeLock();
+        other.readLock();
+        try {
+            for (int i = 0; i < vector.length; i++) {
+                vector[i] += other.get(i);
+            }
+        } finally {
+            other.readUnlock();
+            writeUnlock();
         }
     }
 
     public void negate() {
-        // TODO: negate vector
+        writeLock();
+        try {
+            for (int i = 0; i < vector.length; i++) {
+                vector[i] = -vector[i];
+            }
+        } finally {
+            writeUnlock();
+        }
     }
 
     public double dot(SharedVector other) {
