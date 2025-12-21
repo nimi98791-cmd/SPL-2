@@ -24,9 +24,10 @@ public class LinearAlgebraEngine {
             temp.resolve(leftMatrix.readRowMajor());
         }
         try {
-
             executor.shutdown();
         } catch (InterruptedException e) {
+            // TODO - check if needed.
+            Thread.currentThread().interrupt();
             throw new RuntimeException(e);
         }
         return computationRoot;
@@ -48,14 +49,14 @@ public class LinearAlgebraEngine {
         for (int i = 0; i < leftMatrix.length(); i++) {
             int index = i;
             tasks.add(()-> {
-                System.out.println("thread start");
+                System.out.println("task start");
                 try {
-                    Thread.sleep(5000);
+                    Thread.sleep(2000);
                 } catch (InterruptedException e) {
                     System.out.println();
                 }
                 leftMatrix.get(index).add(rightMatrix.get(index));
-                System.out.println("thread end");
+                System.out.println("task end");
             });
         }
         return tasks;

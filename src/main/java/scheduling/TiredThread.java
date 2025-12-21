@@ -28,6 +28,7 @@ public class TiredThread extends Thread implements Comparable<TiredThread> {
         this.fatigueFactor = fatigueFactor;
         this.idleStartTime.set(System.nanoTime());
         setName(String.format("FF=%.2f", fatigueFactor));
+        System.out.println("thread born" + getName());
     }
 
     public int getWorkerId() {
@@ -56,7 +57,9 @@ public class TiredThread extends Thread implements Comparable<TiredThread> {
      * it throws IllegalStateException.
      */
     public void newTask(Runnable task) {
-        handoff.add(task);
+        if (!handoff.add(task)) {
+            throw new IllegalStateException("Worker " + id + " is already busy!");
+        }
     }
 
     /**
@@ -64,26 +67,41 @@ public class TiredThread extends Thread implements Comparable<TiredThread> {
      * Inserts a poison pill so the worker wakes up and exits.
      */
     public void shutdown() {
-       // TODO
+        // TODO - check if needed put or add.
+        try {
+            handoff.put(POISON_PILL);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 
     @Override
     public void run() {
-        while (true) {
-            try {
+        try {
+            while (alive.get()) {
                 Runnable task = handoff.take();
-                task.run();
-            } catch (InterruptedException e) {
-                break;
+                if (task == POISON_PILL) {
+                    alive.set(false);
+                    System.out.println("thread killed" + getName());
+                    break;
+                }
+                busy.set(true);
+                long startTime = System.nanoTime();
+                try {
+                    task.run();
+                } finally {
+                    long endTime = System.nanoTime();
+                    timeUsed.addAndGet(endTime - startTime);
+                    busy.set(false);
+                }
             }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
     }
 
     @Override
     public int compareTo(TiredThread o) {
         return Double.compare(getFatigue(), o.getFatigue());
-//        if (getFatigue() > o.getFatigue()) return 1;
-//        else if (getFatigue() < o.getFatigue()) return -1;
-//        return 0;
     }
 }

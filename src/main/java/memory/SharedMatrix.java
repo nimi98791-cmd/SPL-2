@@ -13,9 +13,16 @@ public class SharedMatrix {
     }
 
     public void loadRowMajor(double[][] matrix) {
-        vectors = new SharedVector[matrix.length];
-        for (int i = 0; i < matrix.length; i++) {
-            vectors[i] = new SharedVector(matrix[i], VectorOrientation.ROW_MAJOR);
+        SharedVector[] currentVectors = vectors;
+        acquireAllVectorWriteLocks(currentVectors);
+        try {
+            SharedVector[] newVectors = new SharedVector[matrix.length];
+            for (int i = 0; i < matrix.length; i++) {
+                newVectors[i] = new SharedVector(matrix[i], VectorOrientation.ROW_MAJOR);
+            }
+            vectors = newVectors;
+        } finally {
+            releaseAllVectorWriteLocks(currentVectors);
         }
     }
 
@@ -24,21 +31,33 @@ public class SharedMatrix {
     }
 
     public double[][] readRowMajor() {
-        double[][] ans = new double[vectors.length][vectors[0].length()];
-        for (int i = 0; i < vectors.length; i++) {
-            for (int j = 0; j < vectors[i].length(); j++) {
-                ans[i][j] = vectors[i].get(j);
+        SharedVector[] currentVectors = vectors;
+        acquireAllVectorReadLocks(currentVectors);
+        try {
+            if (currentVectors.length == 0) return new double[0][0];
+            double[][] ans = new double[currentVectors.length][currentVectors[0].length()];
+            for (int i = 0; i < currentVectors.length; i++) {
+                for (int j = 0; j < currentVectors[i].length(); j++) {
+                    ans[i][j] = currentVectors[i].get(j);
+                }
             }
+            return ans;
+        } finally {
+            releaseAllVectorReadLocks(currentVectors);
         }
-        return ans;
     }
 
     public SharedVector get(int index) {
-        return vectors[index];
+        SharedVector[] current = this.vectors;
+        if (current != null && index >= 0 && index < current.length) {
+            return current[index];
+        }
+        return null;
     }
 
     public int length() {
-        return vectors.length;
+        SharedVector[] current = this.vectors;
+        return (current != null) ? current.length : 0;
     }
 
     public VectorOrientation getOrientation() {
@@ -47,18 +66,34 @@ public class SharedMatrix {
     }
 
     private void acquireAllVectorReadLocks(SharedVector[] vecs) {
-        // TODO: acquire read lock for each vector
+        for (SharedVector vec : vecs) {
+            if (vec != null) {
+                vec.readLock();
+            }
+        }
     }
 
     private void releaseAllVectorReadLocks(SharedVector[] vecs) {
-        // TODO: release read locks
+        for (SharedVector vec : vecs) {
+            if (vec != null) {
+                vec.readUnlock();
+            }
+        }
     }
 
     private void acquireAllVectorWriteLocks(SharedVector[] vecs) {
-        // TODO: acquire write lock for each vector
+        for (SharedVector vec : vecs) {
+            if (vec != null) {
+                vec.writeLock();
+            }
+        }
     }
 
     private void releaseAllVectorWriteLocks(SharedVector[] vecs) {
-        // TODO: release write locks
+        for (SharedVector vec : vecs) {
+            if (vec != null) {
+                vec.writeUnlock();
+            }
+        }
     }
 }

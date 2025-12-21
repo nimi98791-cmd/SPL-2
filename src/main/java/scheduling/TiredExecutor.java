@@ -17,64 +17,70 @@ public class TiredExecutor {
             TiredThread tiredThread = new TiredThread(i, 0.5 + Math.random());
             workers[i] = tiredThread;
             idleMinHeap.add(tiredThread);
+            tiredThread.start();
         }
     }
 
     public void submit(Runnable task) {
-        inFlight.incrementAndGet();
-
-        TiredThread t;
-        try {
-            t = idleMinHeap.take();
-        } catch (InterruptedException e) {
-            inFlight.decrementAndGet();
-            Thread.currentThread().interrupt();
-            return;
-        }
-        t.newTask(() -> {
-            try {
-                task.run();
-            } finally {
-                if (inFlight.decrementAndGet() == 0) {
-                    synchronized (TiredExecutor.this) {
-                        TiredExecutor.this.notifyAll();
+        synchronized (this) {
+            while (idleMinHeap.isEmpty()) {
+                try {
+                    this.wait(); // Wait for available thread.
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+            TiredThread worker = idleMinHeap.poll();
+            inFlight.incrementAndGet();
+            Runnable wrappedTask = () -> {
+                try {
+                    task.run();
+                } finally {
+                    synchronized (this) {
+                        idleMinHeap.add(worker);
+                        inFlight.decrementAndGet();
+                        this.notifyAll();
                     }
                 }
-                idleMinHeap.add(t);
-            }
-        });
-
-        if (!t.isAlive()) {
-            t.start();
+            };
+            worker.newTask(wrappedTask);
         }
     }
 
     public void submitAll(Iterable<Runnable> tasks) {
+        System.out.println("Start submit all");
         for (Runnable task : tasks) {
             submit(task);
         }
         synchronized (this) {
             while (inFlight.get() > 0) {
                 try {
-                    wait();
+                    this.wait(); // Wait for all threads to finish.
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
-                    return;
                 }
             }
         }
+        System.out.println("Finished submit all");
+//        synchronized (this) {
+//            while (inFlight.get() > 0) {
+//                try {
+//                    wait();
+//                } catch (InterruptedException e) {
+//                    Thread.currentThread().interrupt();
+//                    return;
+//                }
+//            }
+//        }
     }
 
     public void shutdown() throws InterruptedException {
-        for (TiredThread t : workers) {
-            t.interrupt();
-        }
-        for (TiredThread t : workers) {
-            try {
-                t.join();
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                break;
+        synchronized (this) {
+            for (TiredThread worker : workers) {
+                worker.shutdown(); // Signals all workers to stop.
+            }
+            for (TiredThread worker : workers) {
+                worker.join(); // Wait for all workers to finish.
             }
         }
     }
