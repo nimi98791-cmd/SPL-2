@@ -20,8 +20,11 @@ public class SharedMatrix {
     }
 
     public void loadColumnMajor(double[][] matrix) {
-        // TODO: replace internal data with new column-major matrix
-    }
+        vectors = new SharedVector[matrix.length];
+        for (int i = 0; i < matrix.length; i++) {
+            vectors[i] = new SharedVector(matrix[i], VectorOrientation.COLUMN_MAJOR);
+        }
+        }
 
     public double[][] readRowMajor() {
         double[][] ans = new double[vectors.length][vectors[0].length()];
