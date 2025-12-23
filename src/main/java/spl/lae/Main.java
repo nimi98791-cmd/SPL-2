@@ -12,9 +12,8 @@ public class Main {
             LinearAlgebraEngine engine = new LinearAlgebraEngine(Integer.parseInt(args[0]));
             engine.run(root);
             OutputWriter.write(root.getMatrix(), args[2]);
-        } catch (ParseException e) {
-            System.out.println();
+        } catch (IllegalArgumentException | ParseException e) {
+            OutputWriter.write(e.getMessage(),args[2]);
         }
-        System.out.println();
     }
 }

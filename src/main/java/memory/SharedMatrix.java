@@ -7,12 +7,14 @@ public class SharedMatrix {
     public SharedMatrix() {}
 
     public SharedMatrix(double[][] matrix) {
+        if (matrix == null) throw new IllegalArgumentException("Illegal operation: null matrix");
         for (int i = 0; i < matrix.length; i++) {
             vectors[i] = new SharedVector(matrix[i], VectorOrientation.ROW_MAJOR);
         }
     }
 
     public void loadRowMajor(double[][] matrix) {
+        if (matrix == null) throw new IllegalArgumentException("Illegal operation: null matrix");
         SharedVector[] currentVectors = vectors;
         acquireAllVectorWriteLocks(currentVectors);
         try {
@@ -27,6 +29,7 @@ public class SharedMatrix {
     }
 
     public void loadColumnMajor(double[][] matrix) {
+        if (matrix == null) throw new IllegalArgumentException("Illegal operation: null matrix");
         SharedVector[] currentVectors = vectors;
         acquireAllVectorWriteLocks(currentVectors);
         if (matrix.length == 0) return;

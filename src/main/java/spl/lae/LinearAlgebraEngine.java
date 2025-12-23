@@ -18,20 +18,22 @@ public class LinearAlgebraEngine {
     }
 
     public ComputationNode run(ComputationNode computationRoot) {
-        while (computationRoot.getNodeType() != ComputationNodeType.MATRIX) {
-            ComputationNode temp = computationRoot.findResolvable();
-            //
-            temp.associativeNesting();
-            temp = temp.findResolvable();
-            loadAndCompute(temp);
-            temp.resolve(leftMatrix.readRowMajor());
-        }
         try {
-            executor.shutdown();
-        } catch (InterruptedException e) {
-            // TODO - check if needed.
-            Thread.currentThread().interrupt();
-            throw new RuntimeException(e);
+            while (computationRoot.getNodeType() != ComputationNodeType.MATRIX) {
+                ComputationNode temp = computationRoot.findResolvable();
+                temp.associativeNesting();
+                temp = temp.findResolvable();
+                loadAndCompute(temp);
+                temp.resolve(leftMatrix.readRowMajor());
+            }
+        } finally {
+            try {
+                executor.shutdown();
+            } catch (InterruptedException e) {
+                //todo
+                Thread.currentThread().interrupt();
+                throw new RuntimeException(e);
+            }
         }
         return computationRoot;
     }
@@ -49,10 +51,13 @@ public class LinearAlgebraEngine {
     }
 
     public List<Runnable> createAddTasks() {
+        if (leftMatrix.length() != rightMatrix.length() ||
+                leftMatrix.get(0).length() != rightMatrix.get(0).length())
+            throw new IllegalArgumentException("Illegal operation: dimensions mismatch");
         List<Runnable> tasks = new ArrayList<>();
         for (int i = 0; i < leftMatrix.length(); i++) {
             int index = i;
-            tasks.add(()-> {
+            tasks.add(() -> {
                 System.out.println("task add start");
                 try {
                     Thread.sleep(0);
@@ -67,6 +72,8 @@ public class LinearAlgebraEngine {
     }
 
     public List<Runnable> createMultiplyTasks() {
+        if (leftMatrix.get(0).length() != rightMatrix.get(0).length())
+            throw new IllegalArgumentException("Illegal operation: dimensions mismatch");
         List<Runnable> tasks = new ArrayList<>();
         for (int i = 0; i < leftMatrix.length(); i++) {
             int index = i;
@@ -89,7 +96,7 @@ public class LinearAlgebraEngine {
         List<Runnable> tasks = new ArrayList<>();
         for (int i = 0; i < leftMatrix.length(); i++) {
             int index = i;
-            tasks.add(()-> {
+            tasks.add(() -> {
                 System.out.println("task neg start");
                 try {
                     Thread.sleep(0);
@@ -107,7 +114,7 @@ public class LinearAlgebraEngine {
         List<Runnable> tasks = new ArrayList<>();
         for (int i = 0; i < leftMatrix.length(); i++) {
             int index = i;
-            tasks.add(()-> {
+            tasks.add(() -> {
                 System.out.println("task Tran start");
                 try {
                     Thread.sleep(0);
