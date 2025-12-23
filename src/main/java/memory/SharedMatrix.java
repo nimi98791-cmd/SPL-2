@@ -33,7 +33,7 @@ public class SharedMatrix {
         try {
             SharedVector[] newVectors = new SharedVector[matrix[0].length];
             for (int j = 0; j < matrix[0].length; j++) {
-                double[] column = new double[matrix[j].length];
+                double[] column = new double[matrix.length];
                 for (int i = 0; i < matrix.length; i++) {
                     column[i] = matrix[i][j];
                 }

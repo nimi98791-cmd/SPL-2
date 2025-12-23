@@ -96,11 +96,32 @@ public class SharedVector {
     }
 
     public double dot(SharedVector other) {
-        // TODO: compute dot product (row · column)
-        return 0;
+        readLock();
+        other.readLock();
+        try {
+            double ans = 0;
+            for (int i = 0; i < vector.length; i++) {
+                ans += get(i) * other.get(i);
+            }
+            return ans;
+        }
+        finally {
+            readUnlock();
+            other.readUnlock();
+        }
     }
 
     public void vecMatMul(SharedMatrix matrix) {
-        // TODO: compute row-vector × matrix
+        writeLock();
+        try {
+            double[] vec = new double[matrix.length()];
+            for (int i = 0; i < matrix.length(); i++) {
+                vec[i] = dot(matrix.get(i));
+            }
+            vector = vec;
+        }
+        finally {
+            writeUnlock();
+        }
     }
 }

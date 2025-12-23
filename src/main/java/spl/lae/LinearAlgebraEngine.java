@@ -69,9 +69,23 @@ public class LinearAlgebraEngine {
     }
 
     public List<Runnable> createMultiplyTasks() {
-        // TODO: return tasks that perform row × matrix multiplication
-        return null;
+        List<Runnable> tasks = new ArrayList<>();
+        for (int i = 0; i < leftMatrix.length(); i++) {
+            int index = i;
+            tasks.add(() -> {
+                System.out.println("task multi start");
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    System.out.println();
+                }
+                leftMatrix.get(index).vecMatMul(rightMatrix);
+                System.out.println("task multi end");
+            });
+        }
+        return tasks;
     }
+
 
     public List<Runnable> createNegateTasks() {
         List<Runnable> tasks = new ArrayList<>();
@@ -125,6 +139,9 @@ public class LinearAlgebraEngine {
             }
             case TRANSPOSE -> {
                 return createTransposeTasks();
+            }
+            case MULTIPLY -> {
+                return createMultiplyTasks();
             }
             default -> {
                 return null;
