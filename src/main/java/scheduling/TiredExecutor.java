@@ -76,7 +76,14 @@ public class TiredExecutor {
     }
 
     public synchronized String getWorkerReport() {
-        // TODO: return readable statistics for each worker
-        return null;
+        String ans = "";
+        for (int i = 0; i < workers.length; i++) {
+            ans += "ID: " + workers[i].getWorkerId() + "\n" +
+                    "Name: " + workers[i].getName() + "\n" +
+                    "Fatigue: " + workers[i].getFatigue() + "\n" +
+                    "Time used: " + workers[i].getTimeUsed() + "\n" +
+                    "Time idle: " + workers[i].getTimeIdle() + "\n\n";
+        }
+        return ans;
     }
 }

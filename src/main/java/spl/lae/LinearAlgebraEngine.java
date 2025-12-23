@@ -39,15 +39,13 @@ public class LinearAlgebraEngine {
     public void loadAndCompute(ComputationNode node) {
         leftMatrix.loadRowMajor(node.getChildren().get(0).getMatrix());
         ComputationNodeType nodeType = node.getNodeType();
-        if (nodeType == ComputationNodeType.ADD || nodeType == ComputationNodeType.NEGATE) {
+        if (nodeType == ComputationNodeType.ADD) {
             rightMatrix.loadRowMajor(node.getChildren().get(1).getMatrix());
         } else if (nodeType == ComputationNodeType.MULTIPLY) {
             rightMatrix.loadColumnMajor(node.getChildren().get(1).getMatrix());
         }
         List<Runnable> tasks = getTasks(nodeType);
         executor.submitAll(tasks);
-        // TODO: load operand matrices
-        // TODO: create compute tasks & submit tasks to executor
     }
 
     public List<Runnable> createAddTasks() {
@@ -57,7 +55,7 @@ public class LinearAlgebraEngine {
             tasks.add(()-> {
                 System.out.println("task add start");
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(0);
                 } catch (InterruptedException e) {
                     System.out.println();
                 }
@@ -75,7 +73,7 @@ public class LinearAlgebraEngine {
             tasks.add(() -> {
                 System.out.println("task multi start");
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(0);
                 } catch (InterruptedException e) {
                     System.out.println();
                 }
@@ -89,17 +87,16 @@ public class LinearAlgebraEngine {
 
     public List<Runnable> createNegateTasks() {
         List<Runnable> tasks = new ArrayList<>();
-        for (int i = 0; i < rightMatrix.length(); i++) {
+        for (int i = 0; i < leftMatrix.length(); i++) {
             int index = i;
             tasks.add(()-> {
                 System.out.println("task neg start");
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(0);
                 } catch (InterruptedException e) {
                     System.out.println();
                 }
-                rightMatrix.get(index).negate();
-                leftMatrix.get(index).add(rightMatrix.get(index));
+                leftMatrix.get(index).negate();
                 System.out.println("task neg end");
             });
         }
@@ -113,7 +110,7 @@ public class LinearAlgebraEngine {
             tasks.add(()-> {
                 System.out.println("task Tran start");
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(0);
                 } catch (InterruptedException e) {
                     System.out.println();
                 }
@@ -125,8 +122,7 @@ public class LinearAlgebraEngine {
     }
 
     public String getWorkerReport() {
-        // TODO: return summary of worker activity
-        return null;
+        return executor.getWorkerReport();
     }
 
     private List<Runnable> getTasks(ComputationNodeType computationNodeType) {
@@ -144,7 +140,7 @@ public class LinearAlgebraEngine {
                 return createMultiplyTasks();
             }
             default -> {
-                return null;
+                return new ArrayList<>();
             }
         }
     }

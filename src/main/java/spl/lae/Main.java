@@ -6,18 +6,12 @@ import parser.*;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        InputParser parser = new InputParser();
         try {
+            InputParser parser = new InputParser();
             ComputationNode root = parser.parse(args[1]);
             LinearAlgebraEngine engine = new LinearAlgebraEngine(Integer.parseInt(args[0]));
             engine.run(root);
-            for (double[] row : root.getMatrix()) {
-                for (double value : row) {
-                    System.out.print(value + " ");
-                }
-                System.out.println();
-            }
-
+            OutputWriter.write(root.getMatrix(), args[2]);
         } catch (ParseException e) {
             System.out.println();
         }

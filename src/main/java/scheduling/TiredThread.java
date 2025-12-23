@@ -28,7 +28,7 @@ public class TiredThread extends Thread implements Comparable<TiredThread> {
         this.fatigueFactor = fatigueFactor;
         this.idleStartTime.set(System.nanoTime());
         setName(String.format("FF=%.2f", fatigueFactor));
-        System.out.println("thread born" + getName());
+        System.out.println("thread born" + getName()); // todo
     }
 
     public int getWorkerId() {
@@ -49,6 +49,18 @@ public class TiredThread extends Thread implements Comparable<TiredThread> {
 
     public long getTimeIdle() {
         return timeIdle.get();
+    }
+
+    public void updateTimeIdle() {
+        if (!busy.get()) {
+            long now = System.nanoTime();
+            long start = idleStartTime.get();
+            long duration = now - start;
+            if (duration > 0) {
+                timeIdle.addAndGet(duration);
+                idleStartTime.set(now);
+            }
+        }
     }
 
     /**
@@ -80,6 +92,7 @@ public class TiredThread extends Thread implements Comparable<TiredThread> {
         try {
             while (alive.get()) {
                 Runnable task = handoff.take();
+                updateTimeIdle(); // todo
                 if (task == POISON_PILL) {
                     alive.set(false);
                     System.out.println("thread killed" + getName());
@@ -93,6 +106,7 @@ public class TiredThread extends Thread implements Comparable<TiredThread> {
                     long endTime = System.nanoTime();
                     timeUsed.addAndGet(endTime - startTime);
                     busy.set(false);
+                    idleStartTime.set(endTime); // todo
                 }
             }
         } catch (InterruptedException e) {
