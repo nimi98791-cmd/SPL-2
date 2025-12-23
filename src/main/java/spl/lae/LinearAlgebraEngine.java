@@ -20,6 +20,9 @@ public class LinearAlgebraEngine {
     public ComputationNode run(ComputationNode computationRoot) {
         while (computationRoot.getNodeType() != ComputationNodeType.MATRIX) {
             ComputationNode temp = computationRoot.findResolvable();
+            //
+            temp.associativeNesting();
+            temp = temp.findResolvable();
             loadAndCompute(temp);
             temp.resolve(leftMatrix.readRowMajor());
         }
@@ -34,12 +37,15 @@ public class LinearAlgebraEngine {
     }
 
     public void loadAndCompute(ComputationNode node) {
-        if (node.getNodeType() == ComputationNodeType.ADD) {
-            leftMatrix.loadRowMajor(node.getChildren().get(0).getMatrix());
+        leftMatrix.loadRowMajor(node.getChildren().get(0).getMatrix());
+        ComputationNodeType nodeType = node.getNodeType();
+        if (nodeType == ComputationNodeType.ADD || nodeType == ComputationNodeType.NEGATE) {
             rightMatrix.loadRowMajor(node.getChildren().get(1).getMatrix());
-            List<Runnable> tasks = createAddTasks();
-            executor.submitAll(tasks);
+        } else if (nodeType == ComputationNodeType.MULTIPLY) {
+            rightMatrix.loadColumnMajor(node.getChildren().get(1).getMatrix());
         }
+        List<Runnable> tasks = getTasks(nodeType);
+        executor.submitAll(tasks);
         // TODO: load operand matrices
         // TODO: create compute tasks & submit tasks to executor
     }
@@ -49,14 +55,14 @@ public class LinearAlgebraEngine {
         for (int i = 0; i < leftMatrix.length(); i++) {
             int index = i;
             tasks.add(()-> {
-                System.out.println("task start");
+                System.out.println("task add start");
                 try {
-                    Thread.sleep(2000);
+                    Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     System.out.println();
                 }
                 leftMatrix.get(index).add(rightMatrix.get(index));
-                System.out.println("task end");
+                System.out.println("task add end");
             });
         }
         return tasks;
@@ -68,17 +74,61 @@ public class LinearAlgebraEngine {
     }
 
     public List<Runnable> createNegateTasks() {
-        // TODO: return tasks that negate rows
-        return null;
+        List<Runnable> tasks = new ArrayList<>();
+        for (int i = 0; i < rightMatrix.length(); i++) {
+            int index = i;
+            tasks.add(()-> {
+                System.out.println("task neg start");
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    System.out.println();
+                }
+                rightMatrix.get(index).negate();
+                leftMatrix.get(index).add(rightMatrix.get(index));
+                System.out.println("task neg end");
+            });
+        }
+        return tasks;
     }
 
     public List<Runnable> createTransposeTasks() {
-        // TODO: return tasks that transpose rows
-        return null;
+        List<Runnable> tasks = new ArrayList<>();
+        for (int i = 0; i < leftMatrix.length(); i++) {
+            int index = i;
+            tasks.add(()-> {
+                System.out.println("task Tran start");
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    System.out.println();
+                }
+                leftMatrix.get(index).transpose();
+                System.out.println("task Tran end");
+            });
+        }
+        return tasks;
     }
 
     public String getWorkerReport() {
         // TODO: return summary of worker activity
         return null;
+    }
+
+    private List<Runnable> getTasks(ComputationNodeType computationNodeType) {
+        switch (computationNodeType) {
+            case ADD -> {
+                return createAddTasks();
+            }
+            case NEGATE -> {
+                return createNegateTasks();
+            }
+            case TRANSPOSE -> {
+                return createTransposeTasks();
+            }
+            default -> {
+                return null;
+            }
+        }
     }
 }

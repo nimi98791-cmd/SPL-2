@@ -62,16 +62,6 @@ public class TiredExecutor {
             }
         }
         System.out.println("Finished submit all");
-//        synchronized (this) {
-//            while (inFlight.get() > 0) {
-//                try {
-//                    wait();
-//                } catch (InterruptedException e) {
-//                    Thread.currentThread().interrupt();
-//                    return;
-//                }
-//            }
-//        }
     }
 
     public void shutdown() throws InterruptedException {

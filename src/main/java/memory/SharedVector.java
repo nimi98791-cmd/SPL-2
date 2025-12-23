@@ -61,7 +61,14 @@ public class SharedVector {
     }
 
     public void transpose() {
-        // TODO: transpose vector
+        writeLock();
+        try {
+            orientation = getOrientation() == VectorOrientation.ROW_MAJOR ?
+                    VectorOrientation.COLUMN_MAJOR : VectorOrientation.ROW_MAJOR;
+        }
+        finally {
+            writeUnlock();
+        }
     }
 
     public void add(SharedVector other) {
