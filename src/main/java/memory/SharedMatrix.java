@@ -4,12 +4,12 @@ public class SharedMatrix {
 
     private volatile SharedVector[] vectors = {}; // underlying vectors
 
-    public SharedMatrix() {
-        // TODO: initialize empty matrix
-    }
+    public SharedMatrix() {}
 
     public SharedMatrix(double[][] matrix) {
-        // TODO: construct matrix as row-major SharedVectors
+        for (int i = 0; i < matrix.length; i++) {
+            vectors[i] = new SharedVector(matrix[i], VectorOrientation.ROW_MAJOR);
+        }
     }
 
     public void loadRowMajor(double[][] matrix) {
@@ -33,7 +33,7 @@ public class SharedMatrix {
         try {
             SharedVector[] newVectors = new SharedVector[matrix[0].length];
             for (int j = 0; j < matrix[0].length; j++) {
-                double[] column = new double[matrix[j].length];
+                double[] column = new double[matrix.length];
                 for (int i = 0; i < matrix.length; i++) {
                     column[i] = matrix[i][j];
                 }
