@@ -31,11 +31,14 @@ public class TiredExecutor {
                 }
             }
             TiredThread worker = idleMinHeap.poll();
+            worker.updateTimeIdle(); // Stops being idle.
             inFlight.incrementAndGet();
             Runnable wrappedTask = () -> {
+                long startWork = System.nanoTime();
                 try {
                     task.run();
                 } finally {
+                    worker.updateTimeUsed(startWork);
                     synchronized (this) {
                         idleMinHeap.add(worker);
                         inFlight.decrementAndGet();
