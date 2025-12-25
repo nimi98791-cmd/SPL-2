@@ -28,7 +28,6 @@ public class TiredThread extends Thread implements Comparable<TiredThread> {
         this.fatigueFactor = fatigueFactor;
         this.idleStartTime.set(System.nanoTime());
         setName(String.format("FF=%.2f", fatigueFactor));
-        System.out.println("thread born: " + getName()); // todo delete
     }
 
     public int getWorkerId() {
@@ -105,7 +104,6 @@ public class TiredThread extends Thread implements Comparable<TiredThread> {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
-        System.out.println("thread killed: " + getName());
     }
 
     @Override

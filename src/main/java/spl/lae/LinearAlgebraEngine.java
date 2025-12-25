@@ -57,14 +57,7 @@ public class LinearAlgebraEngine {
         for (int i = 0; i < leftMatrix.length(); i++) {
             int index = i;
             tasks.add(() -> {
-                System.out.println("task add start");
-                try {
-                    Thread.sleep(0);
-                } catch (InterruptedException e) {
-                    System.out.println();
-                }
                 leftMatrix.get(index).add(rightMatrix.get(index));
-                System.out.println("task add end");
             });
         }
         return tasks;
@@ -77,14 +70,7 @@ public class LinearAlgebraEngine {
         for (int i = 0; i < leftMatrix.length(); i++) {
             int index = i;
             tasks.add(() -> {
-                System.out.println("task multi start");
-                try {
-                    Thread.sleep(0);
-                } catch (InterruptedException e) {
-                    System.out.println();
-                }
                 leftMatrix.get(index).vecMatMul(rightMatrix);
-                System.out.println("task multi end");
             });
         }
         return tasks;
@@ -96,14 +82,7 @@ public class LinearAlgebraEngine {
         for (int i = 0; i < leftMatrix.length(); i++) {
             int index = i;
             tasks.add(() -> {
-                System.out.println("task neg start");
-                try {
-                    Thread.sleep(0);
-                } catch (InterruptedException e) {
-                    System.out.println();
-                }
                 leftMatrix.get(index).negate();
-                System.out.println("task neg end");
             });
         }
         return tasks;
@@ -114,14 +93,7 @@ public class LinearAlgebraEngine {
         for (int i = 0; i < leftMatrix.length(); i++) {
             int index = i;
             tasks.add(() -> {
-                System.out.println("task Tran start");
-                try {
-                    Thread.sleep(0);
-                } catch (InterruptedException e) {
-                    System.out.println();
-                }
                 leftMatrix.get(index).transpose();
-                System.out.println("task Tran end");
             });
         }
         return tasks;

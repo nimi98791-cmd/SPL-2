@@ -12,7 +12,7 @@ public class Main {
             LinearAlgebraEngine engine = new LinearAlgebraEngine(Integer.parseInt(args[0]));
             ComputationNode result = engine.run(root);
             OutputWriter.write(result.getMatrix(), args[2]);
-        } catch (Throwable e) {
+        } catch (Exception e) { // todo check
             OutputWriter.write(e.getMessage(),args[2]);
         }
     }

@@ -51,7 +51,6 @@ public class TiredExecutor {
     }
 
     public void submitAll(Iterable<Runnable> tasks) {
-        System.out.println("Start submit all");
         for (Runnable task : tasks) {
             submit(task);
         }
@@ -64,7 +63,6 @@ public class TiredExecutor {
                 }
             }
         }
-        System.out.println("Finished submit all");
     }
 
     public void shutdown() throws InterruptedException {
@@ -103,7 +101,7 @@ public class TiredExecutor {
         double sumOfSquaredDeviations = 0.0;
         for (double f : fatigues) {
             double deviation = f - averageFatigue;
-            sumOfSquaredDeviations += deviation * deviation;
+            sumOfSquaredDeviations += (deviation * deviation);
         }
         return sumOfSquaredDeviations;
     }

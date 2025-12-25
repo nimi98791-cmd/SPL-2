@@ -7,6 +7,7 @@ public class SharedMatrix {
     public SharedMatrix() {}
 
     public SharedMatrix(double[][] matrix) {
+        vectors = new SharedVector[matrix.length];
         for (int i = 0; i < matrix.length; i++) {
             vectors[i] = new SharedVector(matrix[i], VectorOrientation.ROW_MAJOR);
         }
