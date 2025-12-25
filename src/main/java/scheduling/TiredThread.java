@@ -28,7 +28,7 @@ public class TiredThread extends Thread implements Comparable<TiredThread> {
         this.fatigueFactor = fatigueFactor;
         this.idleStartTime.set(System.nanoTime());
         setName(String.format("FF=%.2f", fatigueFactor));
-        System.out.println("thread born" + getName()); // todo
+        System.out.println("thread born: " + getName()); // todo delete
     }
 
     public int getWorkerId() {
@@ -52,15 +52,15 @@ public class TiredThread extends Thread implements Comparable<TiredThread> {
     }
 
     public void updateTimeIdle() {
-        if (!busy.get()) {
-            long now = System.nanoTime();
-            long start = idleStartTime.get();
-            long duration = now - start;
-            if (duration > 0) {
-                timeIdle.addAndGet(duration);
-                idleStartTime.set(now);
-            }
-        }
+        long now = System.nanoTime();
+        long idleDuration = now - idleStartTime.get();
+        timeIdle.addAndGet(idleDuration);
+    }
+    public void updateTimeUsed(long startTime) {
+        long now = System.nanoTime();
+        long duration = now - startTime;
+        timeUsed.addAndGet(duration);
+        idleStartTime.set(now); // After being used become idle.
     }
 
     /**
@@ -79,7 +79,6 @@ public class TiredThread extends Thread implements Comparable<TiredThread> {
      * Inserts a poison pill so the worker wakes up and exits.
      */
     public void shutdown() {
-        // TODO - check if needed put or add.
         try {
             handoff.put(POISON_PILL);
         } catch (InterruptedException e) {
@@ -92,26 +91,21 @@ public class TiredThread extends Thread implements Comparable<TiredThread> {
         try {
             while (alive.get()) {
                 Runnable task = handoff.take();
-                updateTimeIdle(); // todo
                 if (task == POISON_PILL) {
                     alive.set(false);
-                    System.out.println("thread killed" + getName());
                     break;
                 }
                 busy.set(true);
-                long startTime = System.nanoTime();
                 try {
                     task.run();
                 } finally {
-                    long endTime = System.nanoTime();
-                    timeUsed.addAndGet(endTime - startTime);
                     busy.set(false);
-                    idleStartTime.set(endTime); // todo
                 }
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
+        System.out.println("thread killed: " + getName());
     }
 
     @Override

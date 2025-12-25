@@ -31,11 +31,14 @@ public class TiredExecutor {
                 }
             }
             TiredThread worker = idleMinHeap.poll();
+            worker.updateTimeIdle(); // Stops being idle.
             inFlight.incrementAndGet();
             Runnable wrappedTask = () -> {
+                long startWork = System.nanoTime();
                 try {
                     task.run();
                 } finally {
+                    worker.updateTimeUsed(startWork);
                     synchronized (this) {
                         idleMinHeap.add(worker);
                         inFlight.decrementAndGet();
@@ -76,14 +79,32 @@ public class TiredExecutor {
     }
 
     public synchronized String getWorkerReport() {
+        double[] fatigues = new double[workers.length];
         String ans = "";
         for (int i = 0; i < workers.length; i++) {
+            fatigues[i] = workers[i].getFatigue();
             ans += "ID: " + workers[i].getWorkerId() + "\n" +
                     "Name: " + workers[i].getName() + "\n" +
-                    "Fatigue: " + workers[i].getFatigue() + "\n" +
+                    "Is busy: " + workers[i].isBusy() + "\n" +
+                    "Fatigue: " + fatigues[i] + "\n" +
                     "Time used: " + workers[i].getTimeUsed() + "\n" +
                     "Time idle: " + workers[i].getTimeIdle() + "\n\n";
         }
+        ans += "Fairness: " + calculateFairness(fatigues);
         return ans;
+    }
+
+    private double calculateFairness(double[] fatigues) {
+        double totalFatigue = 0.0;
+        for (double f : fatigues) {
+            totalFatigue += f;
+        }
+        double averageFatigue = totalFatigue / fatigues.length;
+        double sumOfSquaredDeviations = 0.0;
+        for (double f : fatigues) {
+            double deviation = f - averageFatigue;
+            sumOfSquaredDeviations += deviation * deviation;
+        }
+        return sumOfSquaredDeviations;
     }
 }
