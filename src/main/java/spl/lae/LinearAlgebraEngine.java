@@ -30,7 +30,6 @@ public class LinearAlgebraEngine {
             try {
                 executor.shutdown();
             } catch (InterruptedException e) {
-                //todo
                 Thread.currentThread().interrupt();
                 throw new RuntimeException(e);
             }
@@ -72,7 +71,7 @@ public class LinearAlgebraEngine {
     }
 
     public List<Runnable> createMultiplyTasks() {
-        if (leftMatrix.get(0).length() != rightMatrix.get(0).length())
+        if (rightMatrix.get(0) == null || leftMatrix.get(0).length() != rightMatrix.get(0).length())
             throw new IllegalArgumentException("Illegal operation: dimensions mismatch");
         List<Runnable> tasks = new ArrayList<>();
         for (int i = 0; i < leftMatrix.length(); i++) {

@@ -28,7 +28,7 @@ public class TiredThread extends Thread implements Comparable<TiredThread> {
         this.fatigueFactor = fatigueFactor;
         this.idleStartTime.set(System.nanoTime());
         setName(String.format("FF=%.2f", fatigueFactor));
-        System.out.println("thread born" + getName()); // todo
+        System.out.println("thread born: " + getName()); // todo delete
     }
 
     public int getWorkerId() {
@@ -79,7 +79,6 @@ public class TiredThread extends Thread implements Comparable<TiredThread> {
      * Inserts a poison pill so the worker wakes up and exits.
      */
     public void shutdown() {
-        // TODO - check if needed put or add.
         try {
             handoff.put(POISON_PILL);
         } catch (InterruptedException e) {
@@ -94,7 +93,6 @@ public class TiredThread extends Thread implements Comparable<TiredThread> {
                 Runnable task = handoff.take();
                 if (task == POISON_PILL) {
                     alive.set(false);
-                    System.out.println("thread killed" + getName());
                     break;
                 }
                 busy.set(true);
@@ -107,6 +105,7 @@ public class TiredThread extends Thread implements Comparable<TiredThread> {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
+        System.out.println("thread killed: " + getName());
     }
 
     @Override
