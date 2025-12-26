@@ -68,6 +68,7 @@ public class TiredExecutor {
     public void shutdown() throws InterruptedException {
         synchronized (this) {
             for (TiredThread worker : workers) {
+                worker.updateTimeIdle(); // Update last idle period.
                 worker.shutdown(); // Signals all workers to stop.
             }
             for (TiredThread worker : workers) {
