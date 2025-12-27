@@ -146,7 +146,7 @@ class LinearAlgebraEngineTest {
 
     @Test
     void testRunWithProvidedPath() throws Exception {
-        String filePath = "src/test/java/spl/lae/input.json"; // Update this path
+        String filePath = "src/test/java/spl/lae/input.json";
 
         InputParser parser = new InputParser();
         ComputationNode root = parser.parse(filePath);
@@ -154,15 +154,58 @@ class LinearAlgebraEngineTest {
         LinearAlgebraEngine engine = new LinearAlgebraEngine(3);
         ComputationNode resultNode = engine.run(root);
         System.out.println(engine.getWorkerReport());
+        double[][] resultMatrix = resultNode.getMatrix();
+        assertNotNull(resultMatrix);
+        assertEquals(2, resultMatrix.length);
+        assertEquals(2, resultMatrix[0].length);
+        assertEquals(58.0, resultMatrix[0][0]);
+        assertEquals(64.0, resultMatrix[0][1]);
+        assertEquals(139.0, resultMatrix[1][0]);
+        assertEquals(154.0, resultMatrix[1][1]);
+    }
+    @Test
+    public void testFourMatrixAdditionResponsiveness() throws Exception {
+        String filePath = "src/test/java/spl/lae/input2.json";
 
-//        double[][] resultMatrix = resultNode.getMatrix();
-//        assertNotNull(resultMatrix);
-//        assertEquals(2, resultMatrix.length);
-//        assertEquals(2, resultMatrix[0].length);
-//        assertEquals(58.0, resultMatrix[0][0]);
-//        assertEquals(64.0, resultMatrix[0][1]);
-//        assertEquals(139.0, resultMatrix[1][0]);
-//        assertEquals(154.0, resultMatrix[1][1]);
+        InputParser parser = new InputParser();
+        ComputationNode root = parser.parse(filePath);
+
+        LinearAlgebraEngine engine = new LinearAlgebraEngine(5);
+        parser.ComputationNode resultNode = engine.run(root);
+        double[][] resultMatrix = resultNode.getMatrix();
+        assertNotNull(resultMatrix);
+        assertEquals(10, resultMatrix.length);
+        assertEquals(10.0, resultMatrix[0][0]);
+        assertEquals(10.0, resultMatrix[0][9]);
+        assertEquals(10.0, resultMatrix[9][0]);
+        assertEquals(10.0, resultMatrix[9][9]);
+        assertEquals(10.0, resultMatrix[5][5]);
+        String report = engine.getWorkerReport();
+        System.out.println(report);
+    }
+
+    @Test
+    public void testEverything() throws Exception {
+        String filePath = "src/test/java/spl/lae/input3.json";
+
+        InputParser parser = new InputParser();
+        ComputationNode root = parser.parse(filePath);
+
+        LinearAlgebraEngine engine = new LinearAlgebraEngine(4);
+        parser.ComputationNode resultNode = engine.run(root);
+        double[][] resultMatrix = resultNode.getMatrix();
+
+        assertNotNull(resultMatrix);
+        assertEquals(2, resultMatrix.length);
+        assertEquals(2, resultMatrix[0].length);
+
+        assertEquals(-20.0, resultMatrix[0][0]);
+        assertEquals(-44.0, resultMatrix[0][1]);
+        assertEquals(-23.0, resultMatrix[1][0]);
+        assertEquals(-51.0, resultMatrix[1][1]);
+
+        String report = engine.getWorkerReport();
+        System.out.println(report);
     }
 
     private void injectPrivateField(Object target, String fieldName, Object value) throws Exception {
