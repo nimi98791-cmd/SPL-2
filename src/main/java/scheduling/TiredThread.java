@@ -59,7 +59,7 @@ public class TiredThread extends Thread implements Comparable<TiredThread> {
         long now = System.nanoTime();
         long duration = now - startTime;
         timeUsed.addAndGet(duration);
-        idleStartTime.set(now); // After being used become idle.
+        idleStartTime.set(now); // After being used start idle.
     }
 
     /**
