@@ -153,7 +153,6 @@ class LinearAlgebraEngineTest {
 
         LinearAlgebraEngine engine = new LinearAlgebraEngine(3);
         ComputationNode resultNode = engine.run(root);
-        System.out.println(engine.getWorkerReport());
         double[][] resultMatrix = resultNode.getMatrix();
         assertNotNull(resultMatrix);
         assertEquals(2, resultMatrix.length);
@@ -180,8 +179,6 @@ class LinearAlgebraEngineTest {
         assertEquals(10.0, resultMatrix[9][0]);
         assertEquals(10.0, resultMatrix[9][9]);
         assertEquals(10.0, resultMatrix[5][5]);
-        String report = engine.getWorkerReport();
-        System.out.println(report);
     }
 
     @Test
@@ -203,9 +200,6 @@ class LinearAlgebraEngineTest {
         assertEquals(-44.0, resultMatrix[0][1]);
         assertEquals(-23.0, resultMatrix[1][0]);
         assertEquals(-51.0, resultMatrix[1][1]);
-
-        String report = engine.getWorkerReport();
-        System.out.println(report);
     }
 
     private void injectPrivateField(Object target, String fieldName, Object value) throws Exception {
