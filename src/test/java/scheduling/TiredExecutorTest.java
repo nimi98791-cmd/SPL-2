@@ -27,8 +27,8 @@ class TiredExecutorTest {
         }
         TiredThread[] workers = getWorkers(executor);
         for (TiredThread worker : workers) {
-            assertTrue(worker.getTimeUsed() >= 0);
-            assertTrue(worker.getTimeIdle() >= 0);
+            assertTrue(worker.getTimeUsed() > 0);
+            assertTrue(worker.getTimeIdle() > 0);
         }
         assertEquals(numTasks, counter.get());
     }
@@ -51,8 +51,8 @@ class TiredExecutorTest {
         }
         TiredThread[] workers = getWorkers(executor);
         for (TiredThread worker : workers) {
-            assertTrue(worker.getTimeUsed() >= 0);
-            assertTrue(worker.getTimeIdle() >= 0);
+            assertTrue(worker.getTimeUsed() > 0);
+            assertTrue(worker.getTimeIdle() > 0);
         }
         assertEquals(numTasks, counter.get());
     }
