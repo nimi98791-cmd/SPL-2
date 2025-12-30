@@ -11,7 +11,7 @@ class TiredExecutorTest {
 
     @Test
     void testSubmitAll() throws InterruptedException {
-        int numThreads = 3;
+        int numThreads = 2;
         int numTasks = 10;
         TiredExecutor executor = new TiredExecutor(numThreads);
         AtomicInteger counter = new AtomicInteger(0);
