@@ -4,7 +4,6 @@ import parser.*;
 import memory.*;
 import scheduling.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class LinearAlgebraEngine {
@@ -53,50 +52,42 @@ public class LinearAlgebraEngine {
         if (leftMatrix.length() != rightMatrix.length() ||
                 leftMatrix.get(0).length() != rightMatrix.get(0).length())
             throw new IllegalArgumentException("Illegal operation: dimensions mismatch");
-        List<Runnable> tasks = new ArrayList<>();
+        Runnable[] tasks = new Runnable[leftMatrix.length()];
         for (int i = 0; i < leftMatrix.length(); i++) {
             int index = i;
-            tasks.add(() -> {
-                leftMatrix.get(index).add(rightMatrix.get(index));
-            });
+            tasks[i] = () -> leftMatrix.get(index).add(rightMatrix.get(index));
         }
-        return tasks;
+        return List.of(tasks);
     }
 
     public List<Runnable> createMultiplyTasks() {
         if (rightMatrix.get(0) == null || leftMatrix.get(0).length() != rightMatrix.get(0).length())
             throw new IllegalArgumentException("Illegal operation: dimensions mismatch");
-        List<Runnable> tasks = new ArrayList<>();
+        Runnable[] tasks = new Runnable[leftMatrix.length()];
         for (int i = 0; i < leftMatrix.length(); i++) {
             int index = i;
-            tasks.add(() -> {
-                leftMatrix.get(index).vecMatMul(rightMatrix);
-            });
+            tasks[i] = () -> leftMatrix.get(index).vecMatMul(rightMatrix);
         }
-        return tasks;
+        return List.of(tasks);
     }
 
 
     public List<Runnable> createNegateTasks() {
-        List<Runnable> tasks = new ArrayList<>();
+        Runnable[] tasks = new Runnable[leftMatrix.length()];
         for (int i = 0; i < leftMatrix.length(); i++) {
             int index = i;
-            tasks.add(() -> {
-                leftMatrix.get(index).negate();
-            });
+            tasks[i] = () -> leftMatrix.get(index).negate();
         }
-        return tasks;
+        return List.of(tasks);
     }
 
     public List<Runnable> createTransposeTasks() {
-        List<Runnable> tasks = new ArrayList<>();
+        Runnable[] tasks = new Runnable[leftMatrix.length()];
         for (int i = 0; i < leftMatrix.length(); i++) {
             int index = i;
-            tasks.add(() -> {
-                leftMatrix.get(index).transpose();
-            });
+            tasks[i] = () -> leftMatrix.get(index).transpose();
         }
-        return tasks;
+        return List.of(tasks);
     }
 
     public String getWorkerReport() {
@@ -118,7 +109,7 @@ public class LinearAlgebraEngine {
                 return createMultiplyTasks();
             }
             default -> {
-                return new ArrayList<>();
+                return List.of(new Runnable[0]);
             }
         }
     }
