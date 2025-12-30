@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class TiredExecutorTest {
 
     @Test
-    void testSubmitAllIncrementsCounter() throws InterruptedException {
+    void testSubmitAll() throws InterruptedException {
         int numThreads = 3;
         int numTasks = 10;
         TiredExecutor executor = new TiredExecutor(numThreads);
@@ -32,7 +32,7 @@ class TiredExecutorTest {
     }
 
     @Test
-    void testHighLoadStability() throws InterruptedException {
+    void testSubmitAllHighLoadStability() throws InterruptedException {
         int numThreads = 4;
         int numTasks = 1000;
         TiredExecutor executor = new TiredExecutor(numThreads);
