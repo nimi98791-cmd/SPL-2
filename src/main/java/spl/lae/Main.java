@@ -11,6 +11,7 @@ public class Main {
             LinearAlgebraEngine engine = new LinearAlgebraEngine(Integer.parseInt(args[0]));
             ComputationNode result = engine.run(root);
             OutputWriter.write(result.getMatrix(), args[2]);
+            System.out.println(engine.getWorkerReport());
         } catch (Exception e) {
             OutputWriter.write(e.getMessage(),args[2]);
         }
