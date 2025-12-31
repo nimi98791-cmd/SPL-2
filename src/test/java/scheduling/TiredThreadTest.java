@@ -2,12 +2,14 @@ package scheduling;
 
 import org.junit.jupiter.api.Test;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class TiredThreadTest {
 
     @Test
-    void testTaskExecutionWithShutdownAndJoin() throws InterruptedException {
+    void testTaskExecution() throws InterruptedException {
         TiredThread worker = new TiredThread(1, 1.0);
         worker.start();
 
@@ -19,5 +21,23 @@ class TiredThreadTest {
 
         assertEquals(1, counter.get());
         assertFalse(worker.isBusy());
+    }
+
+    @Test
+    void testRunThrowsException() throws InterruptedException {
+        TiredThread worker = new TiredThread(1, 1.0);
+
+        AtomicReference<Throwable> exceptionCatcher = new AtomicReference<>();
+
+        worker.setUncaughtExceptionHandler((t, e) -> exceptionCatcher.set(e));
+
+        worker.start();
+        worker.newTask(() -> {
+            throw new RuntimeException("ABBA");
+        });
+        worker.join();
+        assertNotNull(exceptionCatcher.get());
+        assertEquals("ABBA", exceptionCatcher.get().getMessage());
+        assertTrue(exceptionCatcher.get() instanceof RuntimeException);
     }
 }
